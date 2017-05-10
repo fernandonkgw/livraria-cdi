@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
+import javax.faces.view.ViewScoped;
+import javax.inject.Named;
 
 import org.primefaces.model.chart.BarChartModel;
 import org.primefaces.model.chart.ChartSeries;
@@ -15,10 +15,9 @@ import br.com.alura.livraria.dao.DAO;
 import br.com.alura.livraria.modelo.Livro;
 import br.com.alura.livraria.modelo.Venda;
 
-@ManagedBean
+@Named
 @ViewScoped
-public class VendasBean implements Serializable{
-
+public class VendasBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -26,7 +25,7 @@ public class VendasBean implements Serializable{
 
 		BarChartModel model = new BarChartModel();
 		model.setAnimate(true);
-		
+
 		ChartSeries vendaSerie = new ChartSeries();
 		vendaSerie.setLabel("Vendas 2016");
 
@@ -34,10 +33,10 @@ public class VendasBean implements Serializable{
 		for (Venda venda : vendas) {
 			vendaSerie.set(venda.getLivro().getTitulo(), venda.getQuantidade());
 		}
-		
+
 		ChartSeries vendaSerie2015 = new ChartSeries();
 		vendaSerie2015.setLabel("Vendas 2015");
-		
+
 		vendas = getVendas(4321);
 		for (Venda venda : vendas) {
 			vendaSerie2015.set(venda.getLivro().getTitulo(), venda.getQuantidade());
