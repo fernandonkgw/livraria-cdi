@@ -1,21 +1,33 @@
 package br.com.alura.livraria.util;
 
+import java.util.Map;
+
+import javax.enterprise.event.Observes;
 import javax.faces.application.NavigationHandler;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseEvent;
-import javax.faces.event.PhaseId;
-import javax.faces.event.PhaseListener;
+import javax.inject.Inject;
 
+import br.com.alura.livraria.jsf.annotation.ScopeMap;
+import br.com.alura.livraria.jsf.annotation.ScopeMap.Scope;
+import br.com.alura.livraria.jsf.phaselistener.After;
+import br.com.alura.livraria.jsf.phaselistener.Phase;
+import br.com.alura.livraria.jsf.phaselistener.Phase.Phases;
 import br.com.alura.livraria.modelo.Usuario;
 
-public class Autorizador implements PhaseListener  {
+public class Autorizador {
 
-	private static final long serialVersionUID = 1L;
+	@Inject
+	private FacesContext context;
+	
+	@Inject @ScopeMap(Scope.SESSION)
+	private Map<String, Object> sessionMap;
 
-	@Override
-	public void afterPhase(PhaseEvent evento) {
+	@Inject
+	private NavigationHandler handler;
+	
+	public void afterPhase(@Observes @After @Phase(Phases.RESTORE_VIEW) PhaseEvent evento) {
 
-		FacesContext context = evento.getFacesContext();
 		String nomePagina = context.getViewRoot().getViewId();
 	
 		System.out.println(nomePagina);
@@ -24,7 +36,7 @@ public class Autorizador implements PhaseListener  {
 			return;
 		}
 		
-		Usuario usuarioLogado = (Usuario) context.getExternalContext().getSessionMap().get("usuarioLogado");
+		Usuario usuarioLogado = (Usuario) sessionMap.get("usuarioLogado");
 		
 		if(usuarioLogado != null) {
 			return;
@@ -32,18 +44,8 @@ public class Autorizador implements PhaseListener  {
 		
 		//redirecionamento para login.xhtml
 		
-		NavigationHandler handler = context.getApplication().getNavigationHandler();
 		handler.handleNavigation(context, null, "/login?faces-redirect=true");
 		context.renderResponse();
 	} 
-
-	@Override
-	public void beforePhase(PhaseEvent event) {
-	}
-
-	@Override
-	public PhaseId getPhaseId() {
-		return PhaseId.RESTORE_VIEW;
-	}
 
 }

@@ -4,9 +4,10 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 
-public class DAO<T> implements Serializable {
+public class DAO<T, I> implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private final Class<T> classe;
@@ -47,11 +48,16 @@ public class DAO<T> implements Serializable {
 		return instancia;
 	}
 
-	public int contaTodos() {
-		long result = (Long) em.createQuery("select count(n) from livro n")
-				.getSingleResult();
-
-		return (int) result;
+	public Long contaTodos() {
+		
+		CriteriaBuilder builder = em.getCriteriaBuilder();
+		CriteriaQuery<Long> query = builder.createQuery(Long.class);
+		
+		query.select(builder.count(query.from(classe)));
+		
+		Long result = em.createQuery(query).getSingleResult();
+		
+		return result;
 	}
 
 	public List<T> listaTodosPaginada(int firstResult, int maxResults) {

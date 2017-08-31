@@ -6,7 +6,6 @@ import javax.inject.Inject;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
-import javax.persistence.EntityManager;
 
 import br.com.alura.livraria.tx.annotation.Transacional;
 
@@ -15,28 +14,16 @@ import br.com.alura.livraria.tx.annotation.Transacional;
 public class GerenciadorDeTransacao implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
-	private EntityManager manager;
+	private Transacionado transacionado;
 
 	@Inject
-	public GerenciadorDeTransacao(EntityManager manager) {
-		this.manager = manager;
+	public GerenciadorDeTransacao(Transacionado transacionado) {
+		this.transacionado = transacionado;
 	}
 	
 	@AroundInvoke
 	public Object executaComTransacao(InvocationContext context) {
-		manager.getTransaction().begin();
 		
-		try {
-			Object resultado = context.proceed();
-			manager.getTransaction().commit();
-			
-			return resultado;
-		} catch (Exception e) {
-			manager.getTransaction().rollback();
-			throw new RuntimeException(e);
-		}
-		
-		
+		return transacionado.executaComTransacao(context);
 	}
 }
